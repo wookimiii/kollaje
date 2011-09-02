@@ -1,1 +1,14 @@
 h1 New Kollage
+form(action="/create", method="POST")
+  ul
+    li
+      label Name
+      input(name="title", type='text')
+    li
+      label Description
+      input(name="description", type='text')
+    li
+      label Owner
+      input(name="owner", type='text')
+    li
+      input(type='submit', value='Create')

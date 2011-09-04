@@ -51,7 +51,7 @@ fs.readFile('amazon.txt', 'UTF-8', function (err, data) {
 
 // Initialization
 var app = express.createServer(
-	form({ keepExtensions: true })
+	form({ keepExtensions: true , uploadDir: "public/pics"})
 );
 mongoose.connect(generate_mongo_url(mongocnf));
 

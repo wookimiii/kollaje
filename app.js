@@ -37,11 +37,11 @@ var generate_mongo_url = function(obj){
 }
 
 // Amazon S3
-var client = null;
+var amazon = null;
 fs.readFile('amazon.txt', 'UTF-8', function (err, data) {
   if (err) throw err;
 	var cred = JSON.parse(data);
-	client = knox.createClient({
+	amazon = knox.createClient({
 	    key: cred.access_key
 	  , secret: cred.secret_key
 	  , bucket: 'kollaje'
@@ -125,9 +125,33 @@ app.post('/create', function(req, res){
 	res.send(req.body);
 })
 
-app.get('/k/:id', function(req, res){
-	Kollaje.findOne({title: req.param('id')}, function(err, doc){
-		res.render('show.jade', {locals:doc});
+app.get('/k/:title', function(req, res){
+	Kollaje.findOne({title: req.param('title')}, function(err, kollaje){
+		res.render('show.jade', {locals:kollaje});
+	});
+});
+
+app.get('/k/:title/:pic', function(req, res){
+	res.contentType(req.param("pic"));
+	Kollaje.findOne({title: req.param('title')}, function(err, kollaje){
+		var filename = kollaje._id.toString() + "/" + req.param("pic")
+		var image = new Buffer(0);
+		amazon.get(filename).on('response', function(resp){
+	  	resp.on('data', function(chunk){
+				// console.log(chunk.length);
+				// 			 	image = new Buffer(image+chunk)
+				res.write(chunk);
+				// image.write(chunk.toString(), image.length);
+				//res.send(chunk);
+		  });
+			resp.on('end', function(){
+				// console.log("HELLO");
+				// 			console.log(image.length);
+				// 			res.send(image);
+				res.end()
+			})
+		}).end();
+		
 	});
 });
 
@@ -163,7 +187,7 @@ app.post('/k/:name/new', function(req, res, next){
 				pic = _.last(kollaje.pics);
 				fs.readFile(pic.filepath, function(err, buf){
 					var filename = kollaje._id.toString() + "/" + pic._id.toString() + "." + pic.extension;
-				  var put = client.put( filename, {
+				  var put = amazon.put( filename, {
 					 				      'Content-Length': buf.length
 					 				    , 'Content-Type': pic.filetype
 					 				  });

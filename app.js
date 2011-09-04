@@ -6,8 +6,7 @@ var express = 	require('express')
 	, form = 			require('connect-form')
 	, knox = 			require('knox')
 	, fs = 				require('fs')
-	, _ = 				require('underscore')
-	, $ = 				require('jquery');
+	, _ = 				require('underscore');
 
 /**
  * Module dependencies.
@@ -41,7 +40,7 @@ var generate_mongo_url = function(obj){
 var client = null;
 fs.readFile('amazon.txt', 'UTF-8', function (err, data) {
   if (err) throw err;
-	var cred = $.parseJSON(data);
+	var cred = JSON.parse(data);
 	client = knox.createClient({
 	    key: cred.access_key
 	  , secret: cred.secret_key
@@ -118,7 +117,6 @@ app.get('/new', function(req, res){
 
 app.post('/create', function(req, res){
 	var kollaje = new Kollaje();
-	console.log(req.param('owner'));
 	kollaje.owner = req.param('owner');
 	kollaje.title = req.param('title');
 	kollaje.description = req.param('description');
@@ -135,7 +133,6 @@ app.get('/k/:id', function(req, res){
 
 app.get('/k/:name/new', function(req, res){
 	Kollaje.findOne({title: req.param('name')}, function(err, doc){
-		console.log(doc);
 		res.render('new_pic.jade', {locals: {
 			title: doc.title
 			, kollaje: doc
@@ -156,7 +153,6 @@ app.post('/k/:name/new', function(req, res, next){
       next(err);
     } else {
 			Kollaje.findOne({title: req.param('name')}, function(err, kollaje){
-				console.log(files.image);
       	kollaje.pics.push({
 						filename: files.image.filename
 					, filepath: files.image.path
@@ -165,12 +161,11 @@ app.post('/k/:name/new', function(req, res, next){
 				});
 				kollaje.save();
 				pic = _.last(kollaje.pics);
-				console.log()
 				fs.readFile(pic.filepath, function(err, buf){
 					var filename = kollaje._id.toString() + "/" + pic._id.toString() + "." + pic.extension;
 				  var put = client.put( filename, {
 					 				      'Content-Length': buf.length
-					 				    , 'Content-Type': 'text/plain'
+					 				    , 'Content-Type': pic.filetype
 					 				  });
 				  put.on('response', function(resp){
 	 				    if (200 == resp.statusCode) {

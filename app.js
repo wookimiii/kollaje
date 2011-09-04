@@ -131,6 +131,16 @@ app.get('/k/:title', function(req, res){
 	});
 });
 
+app.get('/k/:name/new', function(req, res){
+	Kollaje.findOne({title: req.param('name')}, function(err, doc){
+		res.render('new_pic.jade', {locals: {
+			title: doc.title
+			, kollaje: doc
+		}
+		});
+	});
+});
+
 app.get('/k/:title/:pic', function(req, res){
 	res.contentType(req.param("pic"));
 	Kollaje.findOne({title: req.param('title')}, function(err, kollaje){
@@ -155,15 +165,6 @@ app.get('/k/:title/:pic', function(req, res){
 	});
 });
 
-app.get('/k/:name/new', function(req, res){
-	Kollaje.findOne({title: req.param('name')}, function(err, doc){
-		res.render('new_pic.jade', {locals: {
-			title: doc.title
-			, kollaje: doc
-		}
-		});
-	});
-});
 
 
 // PICTURES

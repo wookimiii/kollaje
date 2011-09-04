@@ -1,3 +1,10 @@
 h1= title
 
 a(href='/new') New Kollage
+
+- each kollaje in kollajes
+  div
+    a(href='/k/#{kollaje.title}')
+      = kollaje.title
+    \ by
+    = kollaje.owner || "Unknown"

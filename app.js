@@ -16,25 +16,7 @@ var express = 	require('express')
 var port = (process.env.PORT || 3000);
 // var host = (process.env.VCAP_APP_HOST || 'localhost');
 
-var mongocnf = {"hostname":"localhost","port":27017,"username":"",
-  "password":"","name":"", "db":"db"}
-if(process.env.VCAP_SERVICES){
-  var env = JSON.parse(process.env.VCAP_SERVICES);
-  mongocnf = env['mongodb-1.8'][0]['credentials'];
-}
-
-var generate_mongo_url = function(obj){
-  obj.hostname = (obj.hostname || 'localhost');
-  obj.port = (obj.port || 27017);
-  obj.db = (obj.db || 'test');
-
-  if(obj.username && obj.password){
-    return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
-  }
-  else{
-    return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
-  }
-}
+var mongo_url = process.env.MONGOLAB_URI || "mongodb://localhost:27017/db"
 
 // Amazon S3
 var amazon = null;
@@ -53,7 +35,7 @@ fs.readFile('amazon.txt', 'UTF-8', function (err, data) {
 var app = express.createServer(
 	form({ keepExtensions: true , uploadDir: "public/pics"})
 );
-mongoose.connect(generate_mongo_url(mongocnf));
+mongoose.connect(mongo_url);
 
 // Data Models
 var Schema = mongoose.Schema

@@ -14,21 +14,25 @@ var express = 	require('express')
 
 // Cloudfoundry config
 var port = (process.env.PORT || 3000);
-// var host = (process.env.VCAP_APP_HOST || 'localhost');
 
 var mongo_url = process.env.MONGOLAB_URI || "mongodb://localhost:27017/db"
 
 // Amazon S3
 var amazon = null;
-fs.readFile('amazon.txt', 'UTF-8', function (err, data) {
-  if (err) throw err;
-	var cred = JSON.parse(data);
-	amazon = knox.createClient({
-	    key: cred.access_key
-	  , secret: cred.secret_key
-	  , bucket: 'kollaje'
+var S3_KEY = process.env.S3_KEY || "";
+var S3_SECRET = process.env.S3_SECRET || "";
+if( S3_KEY == "" ){
+	fs.readFile('amazon.txt', 'UTF-8', function (err, data) {
+	  if (err) throw err;
+		var cred = JSON.parse(data);
+		amazon = knox.createClient({
+		    key: cred.access_key
+		  , secret: cred.secret_key
+		  , bucket: 'kollaje_dev'
+		});
 	});
-});
+}
+
 
 
 // Initialization

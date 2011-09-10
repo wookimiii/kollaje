@@ -13,8 +13,8 @@ var express = 	require('express')
  */
 
 // Cloudfoundry config
-var port = (process.env.VMC_APP_PORT || 3000);
-var host = (process.env.VCAP_APP_HOST || 'localhost');
+var port = (process.env.PORT || 3000);
+// var host = (process.env.VCAP_APP_HOST || 'localhost');
 
 var mongocnf = {"hostname":"localhost","port":27017,"username":"",
   "password":"","name":"", "db":"db"}

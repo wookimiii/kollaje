@@ -46,11 +46,12 @@ mongoose.connect(mongo_url);
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 
-var Pic = new Schema({
+var PicSchema = new Schema({
 		filename		: String
 	, filepath		: String
 	, filetype		: String
 	, extension		: String
+	, kollaje_id	: ObjectId
 	, created_at	: Date
 })
 
@@ -59,10 +60,9 @@ var KollajeSchema = new Schema({
   , title     	: String
   , description : String
   , date      	: Date
-	, pics      	: [Pic]
 });
 
-
+var Pic = mongoose.model('Pic', PicSchema);
 
 var Kollaje = mongoose.model('Kollaje', KollajeSchema);
 
@@ -115,9 +115,13 @@ app.post('/create', function(req, res){
 app.get('/k/:title', function(req, res){
 	Kollaje.findOne({title: req.param('title')}, function(err, kollaje){
 		var tmpdate = new Date();
-		kollaje.pics =  _.sortBy(kollaje.pics, function(pic){ return tmpdate - pic.created_at; })
-		console.log(kollaje.pics[0]._id);
-		res.render('show.jade', {locals:kollaje});
+		query = Pic.find({kollaje_id: kollaje._id})
+		query.sort('created_at', -1)
+		query.exec( function(err, pics){
+			kollaje.pics = pics || []
+			res.render('show.jade', {locals:kollaje});
+		})
+		
 	});
 });
 
@@ -176,14 +180,15 @@ app.post('/k/:name/new', function(req, res, next){
       next(err);
     } else {
 			Kollaje.findOne({title: req.param('name')}, function(err, kollaje){
-      	kollaje.pics.push({
+				var pic = new Pic({
 						filename: files.image.filename
 					, filepath: files.image.path
 					, filetype: files.image.type
 					, extension: _.last(files.image.filename.split("."))
-				});
-				kollaje.save();
-				pic = _.last(kollaje.pics);
+					, created_at: new Date()
+					, kollaje_id: kollaje._id
+				})
+				pic.save()
 				
 				var filename = kollaje._id.toString() + "/" + pic._id.toString() + "." + pic.extension;
 				uploadToAmazon(pic, pic.filepath, filename);

@@ -6,4 +6,6 @@ a(href='/k/#{title}/new') Upload Picture
       = pic.filename
       br
       img(src="/k/#{title}/#{pic._id.toString()}_thumb.#{pic.extension}")
+      br
+      a(href="/k/#{title}/#{pic._id.toString()}_large.#{pic.extension}") Enlarge
     

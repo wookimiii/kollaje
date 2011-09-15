@@ -6,7 +6,8 @@ var express = 	require('express')
 	, form = 			require('connect-form')
 	, knox = 			require('knox')
 	, fs = 				require('fs')
-	, _ = 				require('underscore');
+	, _ = 				require('underscore')
+	, im = 				require('imagemagick')
 
 /**
  * Module dependencies.
@@ -37,7 +38,7 @@ if( S3_KEY == "" ){
 
 // Initialization
 var app = express.createServer(
-	form({ keepExtensions: true , uploadDir: "public/pics"})
+	form({ keepExtensions: true})
 );
 mongoose.connect(mongo_url);
 
@@ -113,6 +114,9 @@ app.post('/create', function(req, res){
 
 app.get('/k/:title', function(req, res){
 	Kollaje.findOne({title: req.param('title')}, function(err, kollaje){
+		var tmpdate = new Date();
+		kollaje.pics =  _.sortBy(kollaje.pics, function(pic){ return tmpdate - pic.created_at; })
+		console.log(kollaje.pics[0]._id);
 		res.render('show.jade', {locals:kollaje});
 	});
 });
@@ -127,6 +131,7 @@ app.get('/k/:name/new', function(req, res){
 	});
 });
 
+
 app.get('/k/:title/:pic', function(req, res){
 	res.contentType(req.param("pic"));
 	Kollaje.findOne({title: req.param('title')}, function(err, kollaje){
@@ -134,16 +139,9 @@ app.get('/k/:title/:pic', function(req, res){
 		var image = new Buffer(0);
 		amazon.get(filename).on('response', function(resp){
 	  	resp.on('data', function(chunk){
-				// console.log(chunk.length);
-				// 			 	image = new Buffer(image+chunk)
 				res.write(chunk);
-				// image.write(chunk.toString(), image.length);
-				//res.send(chunk);
 		  });
 			resp.on('end', function(){
-				// console.log("HELLO");
-				// 			console.log(image.length);
-				// 			res.send(image);
 				res.end()
 			})
 		}).end();
@@ -152,10 +150,24 @@ app.get('/k/:title/:pic', function(req, res){
 });
 
 
+function uploadToAmazon(pic, filepath, filename){
+	fs.readFile(filepath, function(err, buf){
+	  var put = amazon.put( filename, {
+		 				      'Content-Length': buf.length
+		 				    , 'Content-Type': pic.filetype
+		 				  });
+	  // put.on('response', function(resp){
+	  // 		    if (200 == resp.statusCode) {
+	  // 		      console.log('saved to %s', req.url);
+	  // 		    }
+	  // 		  });
+	  put.end(buf);
+	});
+}
 
 // PICTURES
 app.post('/k/:name/new', function(req, res, next){
-
+	console.log(req.form);
   // connect-form adds the req.form object
   // we can (optionally) define onComplete, passing
   // the exception (if any) fields parsed, and files parsed
@@ -172,24 +184,40 @@ app.post('/k/:name/new', function(req, res, next){
 				});
 				kollaje.save();
 				pic = _.last(kollaje.pics);
-				fs.readFile(pic.filepath, function(err, buf){
-					var filename = kollaje._id.toString() + "/" + pic._id.toString() + "." + pic.extension;
-				  var put = amazon.put( filename, {
-					 				      'Content-Length': buf.length
-					 				    , 'Content-Type': pic.filetype
-					 				  });
-				  put.on('response', function(resp){
-	 				    if (200 == resp.statusCode) {
-	 				      console.log('saved to %s', req.url);
-	 				    }
-	 				  });
-				  put.end(buf);
-				});
-				res.redirect('back');
+				
+				var filename = kollaje._id.toString() + "/" + pic._id.toString() + "." + pic.extension;
+				uploadToAmazon(pic, pic.filepath, filename);
+				
+				im.identify(pic.filepath, function(err, features){
+				  if (err) throw err
+					var thumb_width = 100;
+					var thumb_height = thumb_width * features.height /features.width;
+					var large_width = 600;
+					var large_height = large_width * features.height /features.width;
+					var thumb_path = req.form.uploadDir + "/" + pic._id.toString() + "_thumb." + pic.extension;
+					var thumb_filename = kollaje._id.toString() + "/" + pic._id.toString() + "_thumb." + pic.extension;
+					var large_path = req.form.uploadDir + "/" + pic._id.toString() + "_large." + pic.extension;
+					var large_filename = kollaje._id.toString() + "/" + pic._id.toString() + "_large." + pic.extension;
+					// thumbnail
+					im.convert([pic.filepath, '-resize', thumb_width.toString()+"x"+thumb_height, thumb_path], 
+						function(err, metadata){
+						  if (err) throw err
+							uploadToAmazon(pic, thumb_path, thumb_filename);
+						})	
+					// large
+					im.convert([pic.filepath, '-resize', large_width.toString()+"x"+large_height, large_path], 
+						function(err, metadata){
+						  if (err) throw err
+							uploadToAmazon(pic, large_path, large_filename);
+						})
+					})
+			res.redirect('back');
 			});
     }
   });
-
+	req.form.on('complete', function(){
+		console.log("upload complete");
+	});
   // We can add listeners for several form
   // events such as "progress"
   req.form.on('progress', function(bytesReceived, bytesExpected){
@@ -200,9 +228,9 @@ app.post('/k/:name/new', function(req, res, next){
 
 
 
+
 app.listen(port);
 //console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 
-// imgur key: b797a3ffcf23beaaf06175912324fbd8
 
 

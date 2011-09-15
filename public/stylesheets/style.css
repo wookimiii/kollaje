@@ -4,3 +4,9 @@ body {
 
 a {
   color: #00B7FF;}
+
+.pics div {
+  float: left;
+  padding: 2px;
+  margin: 2px;
+  border: solid 1px #ccc;}

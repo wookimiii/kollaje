@@ -1,9 +1,9 @@
 h1= title
 a(href='/k/#{title}/new') Upload Picture
-- each pic in pics
-  div
-    = pic.filename
-    br
-    \ k/#{title}/#{pic._id.toString()}.#{pic.extension}
-    img(src="/k/#{title}/#{pic._id.toString()}.#{pic.extension}")
+.pics
+  - each pic in pics
+    div
+      = pic.filename
+      br
+      img(src="/k/#{title}/#{pic._id.toString()}_thumb.#{pic.extension}")
     

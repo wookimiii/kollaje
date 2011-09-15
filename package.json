@@ -12,5 +12,6 @@
     , "knox" : ""
     , "underscore" : ""
     , "jquery" : ""
+    , "imagemagick": ""
   }
 }

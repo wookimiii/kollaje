@@ -22,6 +22,7 @@ var mongo_url = process.env.MONGOLAB_URI || "mongodb://localhost:27017/db"
 var amazon = null;
 var S3_KEY = process.env.S3_KEY || "";
 var S3_SECRET = process.env.S3_SECRET || "";
+var S3_BUCKET = process.env.S3_BUCKET || 'kollaje_dev'
 if( S3_KEY == "" ){
 	fs.readFile('amazon.txt', 'UTF-8', function (err, data) {
 	  if (err) throw err;
@@ -29,10 +30,17 @@ if( S3_KEY == "" ){
 		amazon = knox.createClient({
 		    key: cred.access_key
 		  , secret: cred.secret_key
-		  , bucket: 'kollaje_dev'
+		  , bucket: S3_BUCKET
 		});
 	});
+}else{
+	amazon = knox.createClient({
+	    key: S3_KEY
+	  , secret: S3_SECRET
+	  , bucket: S3_BUCKET
+	});
 }
+
 
 
 

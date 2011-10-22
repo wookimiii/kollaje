@@ -24,7 +24,7 @@ var S3_KEY = process.env.S3_KEY || "";
 var S3_SECRET = process.env.S3_SECRET || "";
 var S3_BUCKET = process.env.S3_BUCKET || 'kollaje_dev'
 if( S3_KEY == "" ){
-	fs.readFile('amazon.txt', 'UTF-8', function (err, data) {
+	fs.readFile('config/amazon.txt', 'UTF-8', function (err, data) {
 	  if (err) throw err;
 		var cred = JSON.parse(data);
 		amazon = knox.createClient({

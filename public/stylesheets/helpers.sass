@@ -1,0 +1,196 @@
+/* Colorscheme */
+$orange:     #FF7200
+$dark_grey:  #4D4D4D
+$light_blue: #7CC6FF
+$dark_blue:  #067AB4
+
+$main_text:     #404040
+$links:         #2286c0
+$stats:         #f17319
+$crumbtrail:    #d4f9ff
+$feed_hover:    #fbf5e5
+$red:           #d81b21
+$blue:          #0095cd
+$rosy:          #da5867
+$green:         #64991e
+$pink:          #f895c2
+$neon_green:    #b6ff00
+$green_on_dark: #c4d82d
+
+/* common styles */
+@mixin sans_serif_font($weight: normal, $size: 1em, $line_height: normal) 
+  font: 
+    weight: $weight
+    size: $size
+
+  line-height: $line_height
+
+
+@mixin border_radius($radius: 6px) 
+  -moz-border-radius: $radius
+  -webkit-border-radius: $radius
+  border-radius: $radius
+
+
+@mixin opacity($opacity: 0.6)
+  filter: alpha(opacity=$opacity*100)
+  -khtml-opacity: $opacity
+  -moz-opacity: $opacity
+  opacity: $opacity
+
+
+
+@mixin one_corner_border_radius($top_or_bottom, $left_or_right, $width: 6px) 
+  -moz-border-radius-#{$top_or_bottom}#{$left_or_right}: $width
+  -webkit-border-#{$top_or_bottom}-#{$left_or_right}-radius: $width
+  border-#{$top_or_bottom}-#{$left_or_right}-radius: $width
+
+
+@mixin border_radii($top_left, $top_right, $bottom_right, $bottom_left) 
+  -moz-border-radius-topleft: $top_left
+  -webkit-border-top-left-radius: $top_left
+  border-top-left-radius: $top_left
+  -moz-border-radius-topright: $top_right
+  -webkit-border-top-right-radius: $top_right
+  border-top-right-radius: $top_right
+  -moz-border-radius-bottomright: $bottom_right
+  -webkit-border-bottom-right-radius: $bottom_right
+  border-bottom-right-radius: $bottom_right
+  -moz-border-radius-bottomleft: $bottom_left
+  -webkit-border-bottom-left-radius: $bottom_left
+  border-bottom-left-radius: $bottom_left
+
+
+@mixin box_shadow($properties) 
+  -moz-box-shadow: $properties
+  -webkit-box-shadow: $properties
+  box-shadow: $properties
+
+
+@mixin box_sizing ($type: "border") 
+  /* Acceptable values are border, content, and padding - content is the default W3C model */
+  box-sizing: $type-box
+  -webkit-box-sizing: $type-box
+  -moz-box-sizing: $type-box
+
+
+@mixin inline_block 
+  display: -moz-inline-stack // ff 2
+  display: inline-block
+
+
+@mixin linear_gradient($start, $end, $background: $start, $image: false) 
+  $plainbg: $background
+  $mozbg: -moz-linear-gradient(top center, $start, $end) no-repeat
+  $webkitbg: -webkit-gradient(linear, 0% 0%, 0% 100%, from($start), to($end)) no-repeat
+  $cssbg: gradient(linear, 0% 0%, 0% 100%, from($start), to($end)) no-repeat
+
+  @if $image 
+    $plainbg: $image $plainbg
+    $mozbg: $image,  $mozbg
+    $webkitbg: $image, $webkitbg
+    $cssbg: $image, $cssbg
+  
+
+  background: $plainbg
+  background: $mozbg
+  background: $webkitbg
+  background: $cssbg
+
+
+@mixin image_replacement($width, $height, $background, $position: 0 0) 
+  display: block
+  float: left
+  margin-right: 3px
+  height: $height
+  width: $width
+  background: transparent url($background) no-repeat $position
+  text-indent: -9999px
+  overflow: hidden
+  /* must wrap the image path in quotes but do not wrap the position coordinates */
+
+
+@mixin border_box 
+  -moz-box-sizing:    border-box
+  -webkit-box-sizing: border-box
+  box-sizing:         border-box
+
+
+@mixin helvetica_stack 
+  font-family: "helvetica neue", helvetica, arial, sans-serif
+
+
+@mixin clear_fix 
+  zoom: 1
+  &:after
+    content: "."
+    display: block
+    height: 0
+    clear: both
+    visibility: hidden 
+
+
+.black 
+  color: #d7d7d7
+  border: solid 1px #333333
+  @include linear_gradient(#666666, black, #333333)
+
+
+.gray 
+  color: #e9e9e9
+  border: solid 1px #555555
+  @include linear_gradient(#888888, #575757, #6e6e6e)
+
+
+.white 
+  color: #606060
+  border: solid 1px #b7b7b7
+  @include linear_gradient(white, #dddddd, #eeeeee)
+
+
+.yellow 
+  color: #514721
+  border: solid 1px #ffd324
+  @include linear_gradient(#fff6bf, #ffd324, #fff6bf)
+
+
+.orange 
+  color: white
+  border: solid 1px #da7c0c
+  @include linear_gradient(#faa51a, #f47a20, #f78d1d)
+
+
+.red 
+  color: #faddde
+  border: solid 1px #980c10
+  @include linear_gradient(#ed1c24, #aa1317, #d81b21)
+
+
+.blue 
+  color: #d9eef7
+  border: solid 1px #0076a3
+  @include linear_gradient(#00adee, #0078a5, #0095cd)
+
+
+.rosy 
+  color: #fae7e9
+  color: white
+  border: solid 1px #b73948
+  @include linear_gradient(#f16c7c, #bf404f, #da5867)
+
+
+.green 
+  color: #e8f0de
+  border: solid 1px #538312
+  @include linear_gradient(#7db72f, #4e7d0e, #64991e)
+
+
+.pink 
+  color: #feeef5
+  border: solid 1px #d2729e
+  @include linear_gradient(#feb1d3, #f171ab, #f895c2)
+
+
+.pagination
+  font-size: 1.2em
+

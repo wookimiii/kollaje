@@ -1,9 +1,30 @@
+
 body {
-  padding: 50px;
+  padding: 0px;
+  margin: 0px;
+  background-color: #EFEFEF;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
 
 a {
   color: #00B7FF;}
+
+.top-bar {
+  width: 100%;
+  position: fixed;
+  top: -5px;
+  padding-top: 5px;
+  background-color: #CCC;
+  color: #FEFEFE;}
+.top-bar :@include box_shadow(2px 2px 2px #333); h1 {
+  margin: 5px 10px;}
+
+.clearboth {
+  clear: both;}
+
+.container {
+  background-color: #EFEFEF;;
+  height: 100%;
+  margin: 50px 10px;}
 
 .pics div {
   float: left;

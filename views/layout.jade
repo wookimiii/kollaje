@@ -3,4 +3,9 @@ html
   head
     title= (title || "Kollaje")
     link(rel='stylesheet', href='/stylesheets/style.css')
-  body!= body
+  
+  body
+    div.top-bar
+      h1 Kollaje
+    div.container!= body
+  
